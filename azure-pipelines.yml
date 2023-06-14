@@ -1,30 +1,78 @@
-# Stages
-# Stage-1:
-  # Task-1: Build Docker Image and push to Azure Container Registry ACR
-  # Task-2: Copy kube-manifest files to Build Artifact Directory
-  # Task-3: Publish build articats to Azure Pipelines
-# Pipeline Hierarchial Flow: Stages -> Stage -> Jobs -> Job -> Steps -> Task1, Task2, Task3  
+# Deploy to Azure Kubernetes Service
+# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
 - master
 
-# Variables
+resources:
+- repo: self
+
+variables:
+
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'manual-connection-to-the-container-registry'
+  imageRepository: 'mycustomimage'
+  containerRegistry: 'prajwalnewacr.azurecr.io'
+  dockerfilePath: '**/Dockerfile'
+  tag: '$(Build.BuildId)'
+  imagePullSecret: 'aksdevopsacr21364011-auth'
+
+  # Agent VM image name
+  vmImageName: 'default'
+  
 
 stages:
-# Build Stage 
 - stage: Build
-  displayName: Build Stage
-  jobs:
+  displayName: Build stage
+  jobs:  
   - job: Build
-    displayName: Build Job
+    displayName: Build
     pool:
-      name: 'WDKubePool'
-    steps: 
-
-    # Task-1: Build Docker Image and push to Azure Container Registry ACR
+      vmImage: $(vmImageName)
+    steps:
     - task: Docker@2
+      displayName: Build and push an image to container registry
       inputs:
-        containerRegistry: 'acr-service-connection'
-        repository: 'mycustomimage'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          
+    - upload: manifests
+      artifact: manifests
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'stacksimplifyazuredevopsgithubacraksapp1.default'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: createSecret
+              secretName: $(imagePullSecret)
+              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+              
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: deploy
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              imagePullSecrets: |
+                $(imagePullSecret)
+              containers: |
+                $(containerRegistry)/$(imageRepository):$(tag)
