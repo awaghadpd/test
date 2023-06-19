@@ -19,7 +19,6 @@ variables:
   imagePullSecret: 'aksdevopsacr21364011-auth'
 
   # Agent VM image name
-  vmImageName: 'Default'
   
 
 stages:
@@ -29,7 +28,7 @@ stages:
   - job: Build
     displayName: Build
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
@@ -52,7 +51,7 @@ stages:
   - deployment: Deploy
     displayName: Deploy
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     environment: 'stacksimplifyazuredevopsgithubacraksapp1.default'
     strategy:
       runOnce:
