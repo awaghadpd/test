@@ -30,6 +30,7 @@ steps:
   inputs:
     action: createSecret
     secretName: $(imagePullSecret)
+    kubernetesServiceEndpoint: 'private-aks-cluster-test-service-connection'
     dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 - task: KubernetesManifest@0
   displayName: Deploy to Kubernetes cluster
