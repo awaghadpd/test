@@ -1,5 +1,5 @@
 #!/bin/bash
 
-# Create aks-helloworld and ingress-demo
+# Create demo deployment
 kubectl apply -f deployment.yml --namespace default
 kubectl apply -f service.yml --namespace default
