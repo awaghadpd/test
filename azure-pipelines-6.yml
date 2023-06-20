@@ -25,22 +25,8 @@ steps:
     kubernetesServiceEndpoint: 'private-aks-cluster-test-service-connection'
     namespace: 'ingress-basic'
     command: login
-- task: KubernetesManifest@0
-  displayName: Create imagePullSecret
+- task: Bash@3
   inputs:
-    action: createSecret
-    secretName: $(imagePullSecret)
-    kubernetesServiceEndpoint: 'private-aks-cluster-test-service-connection'
-    dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-- task: KubernetesManifest@0
-  displayName: Deploy to Kubernetes cluster
-  inputs:
-    action: deploy
-    manifests: |
-      $(Pipeline.Workspace)/manifests/deployment.yml
-      $(Pipeline.Workspace)/manifests/service.yml
-    imagePullSecrets: |
-      $(imagePullSecret)
-    containers: |
-     $(containerRegistry)/$(imageRepository):$(tag)
-
+    targetType: 'inline'
+    script: 'sed -i ''s/\r$//'' ''./deploy.sh'''
+    workingDirectory: "private-aks-test/"
