@@ -4,6 +4,9 @@ trigger:
 resources:
 - repo: self
 
+
+pool: 'Default'
+
 variables:
 
   # Container registry service connection established during pipeline creation
