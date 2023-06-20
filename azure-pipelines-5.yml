@@ -55,13 +55,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: Kubernetes@0
-            displayName: 'kubectl login'
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: 'private-aks-cluster-test-service-connection'
-              namespace: 'default'
-              command: login
+          
           - task: KubernetesManifest@0
             displayName: Create imagePullSecret
             inputs:
