@@ -1,19 +1,19 @@
 apiVersion : apps/v1
 kind: Deployment
 metadata:
-  name: app1nginxaks 
+  name: app1nginxaks1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app1nginxaks
+      app: app1nginxaks1
   template:
     metadata:
       labels:
-        app: app1nginxaks 
+        app: app1nginxaks1
     spec:
       containers:
-        - name: app1nginxaks 
+        - name: app1nginxaks1 
           image: prajwalnewacr.azurecr.io/awaghadpdtest
           ports:
           - containerPort: 80
