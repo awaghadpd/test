@@ -39,7 +39,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      az devops -h
+     az devops -h
 # Set Default DevOps Organization and Project:-
 - task: PowerShell@2
   displayName: DEVOPS LOGIN + SET DEFAULT DEVOPS ORG & PROJECT
