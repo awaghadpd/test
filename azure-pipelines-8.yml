@@ -1,7 +1,24 @@
 trigger:
 - main
 
-pool: 'WDKubePool'
+variables:
+  PlanFilename: tfplan
+  TfvarFilename: usrmid.tfvars
+  PAT: cs5tcps2tl3vcbqihpvpr3rd4vsq76kjmha36zhxy4ow7ra2qy6a
+  ServiceConnection: service connection to prajwal rg
+  ResourceGroup: prajwal
+  StorageAccount: tfprpipelinesa
+  Container: terraform
+  TfstateFile: PR/createprworkitem.tfstate
+  PipelineEnv: NonProd
+  Terraform_Version: 1.4.6
+  WorkingDir: $(System.DefaultWorkingDirectory)
+  Target: $(build.artifactstagingdirectory)
+  Artifact: PA
+  anyTfChanges: false
+  DevOpsOrganisation: https://dev.azure.com/prajwal7798
+  DevOpsProjName: azure-devops-github-acr-aks-app1
+  DevOpsRepoName: azure-devops-github-acr-aks-app1
 
 
 steps:
@@ -22,32 +39,32 @@ steps:
     script: |
       az devops -h
 # Set Default DevOps Organization and Project:-
- - task: PowerShell@2
-   displayName: DEVOPS LOGIN + SET DEFAULT DEVOPS ORG & PROJECT
-   inputs:
-     targetType: 'inline'
-     script: |
-      echo "$(PAT)" | az devops login  
-      az devops configure --defaults organization=$(DevOpsOrganisation) project=$(DevOpsProjName)
+- task: PowerShell@2
+  displayName: DEVOPS LOGIN + SET DEFAULT DEVOPS ORG & PROJECT
+  inputs:
+    targetType: 'inline'
+    script: |
+     echo "$(PAT)" | az devops login  
+     az devops configure --defaults organization=$(DevOpsOrganisation) project=$(DevOpsProjName)
 # Create Workitem + Create PR + Associate Workitem with PR + Complete the PR + Delete Source Branch:-
- - task: PowerShell@2
-   displayName: CREATE & COMPLETE PULL REQUEST + WORKITEMS + DELETE SOURCE BRANCH
-   inputs:
-     targetType: 'inline'
-     script: |
-       Write-Host "#######################################################"
-       Write-Host "NAME OF THE SOURCE BRANCH: $(Build.SourceBranchName)"
-       Write-Host "#######################################################"
-       $i="PR-"
-       $j=Get-Random -Maximum 1000
-       Write-Host "###################################################"
-       Write-Host "WORKITEM NUMBER GENERATED IN DEVOPS BOARD: $i$j"
-       Write-Host "###################################################"
-       $wid = az boards work-item create --title $i$j --type "Issue" --query "id"
-       Write-Host "#######################################################" 
-       Write-Host "WORKITEM ID is: $wid"
-       Write-Host "#######################################################"
-       $prid = az repos pr create --repository $(DevOpsRepoName) --source-branch $(Build.SourceBranchName) --target-branch $(DevOpsDestinationBranch) --work-items $wid --transition-work-items true --query "pullRequestId"
-       Write-Host "#######################################################"
-       Write-Host "PULL REQUEST ID is: $prid"
-       Write-Host "#######################################################"
+- task: PowerShell@2
+  displayName: CREATE & COMPLETE PULL REQUEST + WORKITEMS + DELETE SOURCE BRANCH
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "#######################################################"
+      Write-Host "NAME OF THE SOURCE BRANCH: $(Build.SourceBranchName)"
+      Write-Host "#######################################################"
+      $i="PR-"
+      $j=Get-Random -Maximum 1000
+      Write-Host "###################################################"
+      Write-Host "WORKITEM NUMBER GENERATED IN DEVOPS BOARD: $i$j"
+      Write-Host "###################################################"
+      $wid = az boards work-item create --title $i$j --type "Issue" --query "id"
+      Write-Host "#######################################################" 
+      Write-Host "WORKITEM ID is: $wid"
+      Write-Host "#######################################################"
+      $prid = az repos pr create --repository $(DevOpsRepoName) --source-branch $(Build.SourceBranchName) --target-branch $(DevOpsDestinationBranch) --work-items $wid --transition-work-items true --query "pullRequestId"
+      Write-Host "#######################################################"
+      Write-Host "PULL REQUEST ID is: $prid"
+      Write-Host "#######################################################"
