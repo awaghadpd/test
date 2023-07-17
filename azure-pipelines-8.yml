@@ -1,6 +1,8 @@
 trigger:
 - main
 
+pool: 'PR-Test-Pool'
+
 variables:
   PlanFilename: tfplan
   TfvarFilename: usrmid.tfvars
