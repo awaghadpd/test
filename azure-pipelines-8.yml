@@ -1,7 +1,7 @@
 trigger:
 - main
 
-pool: 'PR-Test-Pool'
+pool: 'Default'
 
 variables:
   PlanFilename: tfplan
@@ -55,7 +55,7 @@ steps:
     targetType: 'inline'
     script: |
       Write-Host "#######################################################"
-      Write-Host "NAME OF THE SOURCE BRANCH: $(Build.SourceBranchName)"
+      Write-Host "NAME OF THE SOURCE BRANCH: #$(Build.SourceBranchName)"
       Write-Host "#######################################################"
       $i="PR-"
       $j=Get-Random -Maximum 1000
