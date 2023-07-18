@@ -50,23 +50,23 @@ steps:
      az devops configure --defaults organization=$(DevOpsOrganisation) project=$(DevOpsProjName)
 # Create Workitem + Create PR + Associate Workitem with PR + Complete the PR + Delete Source Branch:-
 - task: PowerShell@2
-  displayName: CREATE & COMPLETE PULL REQUEST + WORKITEMS + DELETE SOURCE BRANCH
+  displayName: CREATE & COMPLETE PULL REQUEST + WORKITEMS
   inputs:
     targetType: 'inline'
     script: |
       Write-Host "#######################################################"
-      Write-Host "NAME OF THE SOURCE BRANCH: #$(Build.SourceBranchName)"
+      Write-Host "NAME OF THE SOURCE BRANCH: My Branch"
       Write-Host "#######################################################"
       $i="PR-"
       $j=Get-Random -Maximum 1000
       Write-Host "###################################################"
-      Write-Host "WORKITEM NUMBER GENERATED IN DEVOPS BOARD: $i$j"
+      Write-Host "WORKITEM NUMBER GENERATED IN DEVOPS BOARD: $j"
       Write-Host "###################################################"
-      $wid = az boards work-item create --title $i$j --type "Issue" --query "id"
+      $wid = az boards work-item create --title $j --type "Issue" --query "id"
       Write-Host "#######################################################" 
-      Write-Host "WORKITEM ID is: $wid"
+      Write-Host "WORKITEM ID is: 1"
       Write-Host "#######################################################"
-      $prid = az repos pr create --repository $(DevOpsRepoName) --source-branch $(Build.SourceBranchName) --target-branch $(DevOpsDestinationBranch) --work-items $wid --transition-work-items true --query "pullRequestId"
+      $prid = az repos pr create --repository $(DevOpsRepoName) --source-branch Dev --target-branch Main --work-items 1 --transition-work-items true --query "pullRequestId"
       Write-Host "#######################################################"
-      Write-Host "PULL REQUEST ID is: $prid"
+      Write-Host "PULL REQUEST ID is: 1"
       Write-Host "#######################################################"
